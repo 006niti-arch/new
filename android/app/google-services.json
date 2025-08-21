@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "372096838354",
+    "project_id": "whatsapp-sender-app-799b5",
+    "storage_bucket": "whatsapp-sender-app-799b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:372096838354:android:3cd18e99374be8d46fdb0b",
+        "android_client_info": {
+          "package_name": "com.example.whatsapp_sender"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJAH1Sv0Wb-NfPmDng2J4bpZd55icZytM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
