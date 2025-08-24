@@ -1,9 +1,8 @@
 plugins {
     id("com.android.application")
-    kotlin("android")
+    id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
 }
-
 android {
     namespace = "com.example.whatsapp_sender"
     compileSdk = 34
