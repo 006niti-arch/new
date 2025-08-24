@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<uses-permission android:name="android.permission.READ_CONTACTS"/>
     <application
-        android:label="whatsapp_sender"
+        android:label="WA Sender Pro"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

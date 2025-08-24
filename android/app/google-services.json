@@ -12,7 +12,20 @@
           "package_name": "com.example.whatsapp_sender"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "372096838354-a55t0vdnq61b24qqf75cvjd958aatsfl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whatsapp_sender",
+            "certificate_hash": "d6d98d1eb505a47199906cc2e76776ecf5c1d2c7"
+          }
+        },
+        {
+          "client_id": "372096838354-q495b9adqoo0bhee6cfv6sl3bqinlc5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBJAH1Sv0Wb-NfPmDng2J4bpZd55icZytM"
@@ -20,7 +33,55 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "372096838354-q495b9adqoo0bhee6cfv6sl3bqinlc5h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "372096838354-cr6qtn052vmif1ar8ina5sovp965f1j8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.whatsappSender"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:372096838354:android:fe936afdb47347b66fdb0b",
+        "android_client_info": {
+          "package_name": "com.example.whatsapp_sender_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "372096838354-q495b9adqoo0bhee6cfv6sl3bqinlc5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJAH1Sv0Wb-NfPmDng2J4bpZd55icZytM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "372096838354-q495b9adqoo0bhee6cfv6sl3bqinlc5h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "372096838354-cr6qtn052vmif1ar8ina5sovp965f1j8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.whatsappSender"
+              }
+            }
+          ]
         }
       }
     }

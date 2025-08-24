@@ -17,11 +17,13 @@ class FileUploadScreen extends StatefulWidget {
 
 class _FileUploadScreenState extends State<FileUploadScreen> {
   final _campaignNameController = TextEditingController();
-  final _messageController = TextEditingController(text: '\n\nReply "STOP" to unsubscribe.');
-  double _delayValue = 20.0;
+  final _messageController = TextEditingController();
+  double _delayValue = 8.0;
   String? _fileName;
   List<String> _parsedNumbers = [];
   bool _canSubmit = false;
+  final String _unsubText = 'Reply "STOP" to unsubscribe.';
+  bool _isMessagePristine = true;
 
   @override
   void initState() {
@@ -31,13 +33,36 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
   }
 
   void _validateForm() {
+    final messageBody = _messageController.text.replaceAll(_unsubText, '').trim();
     final isFormValid = _campaignNameController.text.trim().isNotEmpty &&
-                        _messageController.text.trim().isNotEmpty &&
+                        messageBody.isNotEmpty &&
                         _parsedNumbers.isNotEmpty;
     if (_canSubmit != isFormValid) {
       setState(() {
         _canSubmit = isFormValid;
       });
+    }
+  }
+
+  void _onMessageChanged(String text) {
+    if (_isMessagePristine) return;
+    String body = text.replaceAll(_unsubText, '').trim();
+    String newText = '$body\n\n$_unsubText';
+    if (text != newText) {
+      _messageController.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: body.length),
+      );
+    }
+  }
+
+  void _onMessageTap() {
+    if (_isMessagePristine) {
+      setState(() {
+        _messageController.text = '\n\n$_unsubText';
+        _isMessagePristine = false;
+      });
+      _messageController.selection = const TextSelection.collapsed(offset: 0);
     }
   }
 
@@ -63,7 +88,7 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
     try {
       if (file.extension == 'csv') {
         String content;
-        if (bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
+        if (bytes.length > 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
           content = utf8.decode(bytes.sublist(3));
         } else {
           content = utf8.decode(bytes);
@@ -95,7 +120,7 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
       _fileName = file.name;
       _parsedNumbers = numbers.where((n) => n.trim().startsWith('+')).toList();
     });
-    _validateForm(); // Validate form after file is parsed
+    _validateForm();
   }
   
   @override
@@ -117,7 +142,6 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
               ),
             ),
             const Divider(height: 30),
-
             const Text('2. Select a CSV or Excel File (Mandatory)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const Text('Ensure all numbers include a country code (e.g., +91).'),
             const SizedBox(height: 8),
@@ -138,19 +162,22 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
                 ),
               ),
             const Divider(height: 30),
-
             const Text('3. Compose Your Message (Mandatory)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextFormField(
               controller: _messageController,
+              onTap: _onMessageTap,
+              onChanged: _onMessageChanged,
+              // THIS IS THE FIX
+               keyboardType: TextInputType.multiline,
+              textInputAction: TextInputAction.newline,
+              maxLines: 5,
               decoration: const InputDecoration(
-                hintText: 'Type your message here...',
+                hintText: 'Enter your message here...\n(Use Shift + Enter for new lines on web)', // Added hint
                 prefixIcon: Icon(Icons.message_outlined),
               ),
-              maxLines: 5,
             ),
             const Divider(height: 30),
-            
             Text('4. Set Message Delay: ${_delayValue.toInt()} seconds', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Slider(
               value: _delayValue,
@@ -165,7 +192,6 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
               },
             ),
             const SizedBox(height: 20),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -182,7 +208,7 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
                     context,
                     MaterialPageRoute(builder: (context) => const CampaignStatusScreen()),
                   );
-                } : null, // Button is disabled if form is invalid
+                } : null,
               ),
             ),
           ],

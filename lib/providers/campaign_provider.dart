@@ -1,7 +1,7 @@
 // lib/providers/campaign_provider.dart
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Corrected Import
-import 'package:firebase_auth/firebase_auth.dart';     // Corrected Import
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -9,22 +9,22 @@ class CampaignProvider with ChangeNotifier {
   String _campaignName = '';
   List<String> _phoneNumbers = [];
   String _message = '';
-  int _delayInSeconds = 20;
+  int _delayInSeconds = 17;
   bool _isRunning = false;
-  bool _isPaused = false;
+  bool _isPausedByUser = false;
   int _currentIndex = 0;
   Timer? _timer;
   int _countdownSeconds = 0;
   String _planError = '';
 
   // Getters
-  String get planError => _planError;
   int get countdownSeconds => _countdownSeconds;
   List<String> get phoneNumbers => _phoneNumbers;
   bool get isRunning => _isRunning;
-  bool get isPaused => _isPaused;
+  bool get isPaused => _isPausedByUser;
   int get currentIndex => _currentIndex;
   int get totalNumbers => _phoneNumbers.length;
+  String get planError => _planError;
 
   Future<bool> _isPlanActive() async {
     _planError = '';
@@ -36,10 +36,9 @@ class CampaignProvider with ChangeNotifier {
     try {
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       if (!userDoc.exists) {
+        final expiryDate = DateTime.now().add(const Duration(days: 15));
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'email': user.email,
-          'planType': 'free',
-          'planExpiryDate': null,
+          'email': user.email, 'planType': 'trial', 'planExpiryDate': Timestamp.fromDate(expiryDate),
           'stats': {'totalMessagesSent': 0, 'totalCampaignsSent': 0}
         });
         return true;
@@ -47,10 +46,13 @@ class CampaignProvider with ChangeNotifier {
       final data = userDoc.data()!;
       final planType = data['planType'] as String?;
       final expiryDate = (data['planExpiryDate'] as Timestamp?)?.toDate();
+
       if (planType == 'lifetime') return true;
-      if (planType == 'monthly' || planType == 'yearly') {
+      
+      if (planType == 'trial' || planType == 'monthly' || planType == 'yearly') {
         if (expiryDate == null || expiryDate.isBefore(DateTime.now())) {
-          _planError = "Your plan has expired. Please contact support.";
+          _planError = "Your ${planType ?? 'plan'} has expired. Please upgrade to continue.";
+          notifyListeners();
           return false;
         }
         return true;
@@ -58,6 +60,7 @@ class CampaignProvider with ChangeNotifier {
       return true;
     } catch (e) {
       _planError = "Could not verify your plan. Please try again.";
+      notifyListeners();
       return false;
     }
   }
@@ -69,7 +72,6 @@ class CampaignProvider with ChangeNotifier {
     required int delay,
   }) async {
     if (!await _isPlanActive()) {
-      notifyListeners();
       return;
     }
     final user = FirebaseAuth.instance.currentUser!;
@@ -83,60 +85,89 @@ class CampaignProvider with ChangeNotifier {
     _delayInSeconds = delay;
     _currentIndex = 0;
     _isRunning = true;
-    _isPaused = false;
+    _isPausedByUser = false;
     notifyListeners();
 
     if (_phoneNumbers.isNotEmpty) {
-      _startSending();
+      _runNextStep();
     } else {
-      _isRunning = false;
-      notifyListeners();
+      _finishCampaign(successful: [], failed: []);
     }
   }
 
-  void _startSending() async {
-    final List<String> successfulThisRun = [];
-    final List<String> failedThisRun = [];
-    for (int i = _currentIndex; i < _phoneNumbers.length; i++) {
-      if (_isPaused) {
-        _currentIndex = i;
-        notifyListeners();
-        return;
-      }
-      _currentIndex = i;
-      notifyListeners();
-      String number = _phoneNumbers[i];
-      final Uri whatsappUrl = Uri.parse('https://wa.me/$number?text=${Uri.encodeComponent(_message)}');
-      try {
-        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
-        successfulThisRun.add(number);
-      } catch (e) {
-        print("Could not launch WhatsApp for $number. Error: $e");
-        failedThisRun.add(number);
-      }
-      await _startCountdown();
+  void _runNextStep() async {
+    if (!_isRunning || _isPausedByUser) return;
+    if (_currentIndex >= _phoneNumbers.length) {
+      _finishCampaign(successful: _phoneNumbers, failed: []);
+      return;
     }
-    _isRunning = false;
-    await _saveCampaignToHistory(
-      successfulNumbers: successfulThisRun,
-      failedNumbers: failedThisRun,
-    );
-    notifyListeners();
+    
+    String number = _phoneNumbers[_currentIndex];
+    final Uri whatsappUrl = Uri.parse('https://wa.me/$number?text=${Uri.encodeComponent(_message)}');
+    
+    try {
+      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print("Could not launch WhatsApp for $number. Error: $e");
+    }
+    _startCountdown();
   }
 
-  Future<void> _startCountdown() {
-    final completer = Completer<void>();
+  void _startCountdown() {
+    _timer?.cancel();
     _countdownSeconds = _delayInSeconds;
+    notifyListeners();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_countdownSeconds > 0) {
         _countdownSeconds--;
+        notifyListeners();
       } else {
         timer.cancel();
-        completer.complete();
+        _currentIndex++;
+        notifyListeners();
+        _runNextStep();
       }
-      notifyListeners();
     });
-    return completer.future;
+  }
+
+  void pauseCampaign() {
+    _isPausedByUser = true;
+    _timer?.cancel();
+    notifyListeners();
+  }
+
+  void resumeCampaign() {
+    _isPausedByUser = false;
+    notifyListeners();
+    _startCountdown();
+  }
+
+  void handleAppInactive() {
+    if (_isRunning && !_isPausedByUser) {
+      _timer?.cancel();
+    }
+  }
+
+  void handleAppResumed() {
+    if (_isRunning && !_isPausedByUser) {
+      _startCountdown();
+    }
+  }
+
+  void stopCampaign() {
+    _isRunning = false;
+    _isPausedByUser = false;
+    _timer?.cancel();
+    _currentIndex = 0;
+    _countdownSeconds = 0;
+    _phoneNumbers.clear();
+    notifyListeners();
+  }
+  
+  void _finishCampaign({required List<String> successful, required List<String> failed}) async {
+    _isRunning = false;
+    notifyListeners();
+    await _saveCampaignToHistory(successfulNumbers: successful, failedNumbers: failed);
   }
 
   Future<void> _saveCampaignToHistory({
@@ -145,47 +176,19 @@ class CampaignProvider with ChangeNotifier {
   }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-
     final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
     final int successfulCount = successfulNumbers.length;
-    final int totalAttempted = successfulNumbers.length + failedNumbers.length;
-
     await userRef.collection('campaigns').add({
       'name': _campaignName,
       'date': Timestamp.now(),
       'message': _message,
-      'totalSent': totalAttempted,
+      'totalSent': successfulNumbers.length + failedNumbers.length,
       'successful': successfulNumbers,
       'failed': failedNumbers,
     });
-
     await userRef.update({
       'stats.totalMessagesSent': FieldValue.increment(successfulCount),
       'stats.totalCampaignsSent': FieldValue.increment(1),
     });
-    
-    print("Campaign saved and user stats updated!");
-  }
-
-  void pauseCampaign() {
-    _isPaused = true;
-    _timer?.cancel();
-    notifyListeners();
-  }
-
-  void resumeCampaign() {
-    _isPaused = false;
-    notifyListeners();
-    _startSending();
-  }
-
-  void stopCampaign() {
-    _isRunning = false;
-    _isPaused = false;
-    _timer?.cancel();
-    _phoneNumbers.clear();
-    _currentIndex = 0;
-    _countdownSeconds = 0;
-    notifyListeners();
   }
 }

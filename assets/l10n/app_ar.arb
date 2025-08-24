@@ -1,0 +1,23 @@
+{
+  "missionControl": "مركز التحكم",
+  "loginWelcome": "هل أنت مستعد للانطلاق؟",
+  "loginSubtitle": "سجل الدخول لإطلاق حملتك التالية.",
+  "createAccountTitle": "انضم إلى المهمة",
+  "createAccountSubtitle": "أنشئ حسابًا للبدء.",
+  "emailAddress": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "login": "تسجيل الدخول",
+  "createAccount": "إنشاء حساب",
+  "homeImportContacts": "استيراد من جهات الاتصال",
+  "homeImportContactsSubtitle": "حدد أرقامًا من هاتفك",
+  "homeCreateFromFile": "إنشاء حملة من ملف",
+  "homeCreateFromFileSubtitle": "قم بتحميل ملف CSV أو Excel",
+  "homeQuickSend": "إرسال سريع",
+  "homeQuickSendSubtitle": "أدخل الأرقام يدويًا",
+  "homeCampaignHistory": "سجل الحملات",
+  "homeCampaignHistorySubtitle": "مراجعة الحملات السابقة",
+  "homeManageUnsubscribes": "إدارة إلغاء الاشتراكات",
+  "homeManageUnsubscribesSubtitle": "عرض قائمة إلغاء الاشتراكات",
+  "settingsTitle": "الإعدادات والمعلومات",
+  "settingsPlanDetails": "تفاصيل الخطة والأسعار"
+}

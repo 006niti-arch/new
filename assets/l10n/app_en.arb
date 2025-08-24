@@ -1,0 +1,23 @@
+{
+  "missionControl": "Mission Control",
+  "loginWelcome": "Ready for Liftoff?",
+  "loginSubtitle": "Log in to launch your next campaign.",
+  "createAccountTitle": "Join the Mission",
+  "createAccountSubtitle": "Create an account to get started.",
+  "emailAddress": "Email Address",
+  "password": "Password",
+  "login": "Login",
+  "createAccount": "Create Account",
+  "homeImportContacts": "Import from Contacts",
+  "homeImportContactsSubtitle": "Select numbers from your phone",
+  "homeCreateFromFile": "Create Campaign from File",
+  "homeCreateFromFileSubtitle": "Upload a CSV or Excel file",
+  "homeQuickSend": "Quick Send",
+  "homeQuickSendSubtitle": "Manually enter a few numbers",
+  "homeCampaignHistory": "Campaign History",
+  "homeCampaignHistorySubtitle": "Review past campaigns",
+  "homeManageUnsubscribes": "Manage Unsubscribes",
+  "homeManageUnsubscribesSubtitle": "View your unsubscribe list",
+  "settingsTitle": "Settings & Information",
+  "settingsPlanDetails": "Plan Details & Pricing"
+}

@@ -2,10 +2,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
+import 'package:whatsapp_sender/l10n/app_localizations_manual.dart';
+import 'package:whatsapp_sender/providers/locale_provider.dart';
 import 'package:whatsapp_sender/screens/campaign_history_screen.dart';
+import 'package:whatsapp_sender/screens/contacts_importer_screen.dart';
 import 'package:whatsapp_sender/screens/file_upload_screen.dart';
 import 'package:whatsapp_sender/screens/manual_input_screen.dart';
+import 'package:whatsapp_sender/screens/profile_screen.dart';
 import 'package:whatsapp_sender/screens/settings_screen.dart';
 import 'package:whatsapp_sender/screens/unsubscribe_screen.dart';
 import 'package:whatsapp_sender/theme/app_theme.dart';
@@ -32,6 +37,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // This line makes the screen listen for language changes
+    Provider.of<LocaleProvider>(context);
+
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return const Scaffold(body: Center(child: Text("Not logged in.")));
 
@@ -39,8 +47,13 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mission Control'),
+        title: Text(AppLocalizationsManual.of(context).translate('missionControl')),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            tooltip: 'My Plan',
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())),
+          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
             tooltip: 'Settings',
@@ -77,27 +90,33 @@ class HomeScreen extends StatelessWidget {
               _StatsGrid(totalCampaigns: totalCampaigns, totalMessages: totalMessages),
               const SizedBox(height: 24),
               _ActionCard(
+                icon: Icons.contact_phone_outlined,
+                title: AppLocalizationsManual.of(context).translate('homeImportContacts'),
+                subtitle: AppLocalizationsManual.of(context).translate('homeImportContactsSubtitle'),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactsImporterScreen())),
+              ),
+              _ActionCard(
                 icon: Icons.upload_file_outlined,
-                title: 'Create New Campaign',
-                subtitle: 'Upload a file to start',
+                title: AppLocalizationsManual.of(context).translate('homeCreateFromFile'),
+                subtitle: AppLocalizationsManual.of(context).translate('homeCreateFromFileSubtitle'),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const FileUploadScreen())),
               ),
               _ActionCard(
                 icon: Icons.edit_note,
-                title: 'Quick Send',
-                subtitle: 'Manually enter numbers',
+                title: AppLocalizationsManual.of(context).translate('homeQuickSend'),
+                subtitle: AppLocalizationsManual.of(context).translate('homeQuickSendSubtitle'),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ManualInputScreen())),
               ),
               _ActionCard(
                 icon: Icons.history_edu,
-                title: 'Campaign History',
-                subtitle: 'Review past campaigns',
+                title: AppLocalizationsManual.of(context).translate('homeCampaignHistory'),
+                subtitle: AppLocalizationsManual.of(context).translate('homeCampaignHistorySubtitle'),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CampaignHistoryScreen())),
               ),
               _ActionCard(
                 icon: Icons.block,
-                title: 'Manage Unsubscribes',
-                subtitle: 'View your unsubscribe list',
+                title: AppLocalizationsManual.of(context).translate('homeManageUnsubscribes'),
+                subtitle: AppLocalizationsManual.of(context).translate('homeManageUnsubscribesSubtitle'),
                 iconColor: AppTheme.errorColor,
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UnsubscribeScreen())),
               ),
@@ -109,7 +128,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// --- Reusable Styled Widgets for the Dashboard ---
+// --- ALL HELPER WIDGETS ARE NOW INCLUDED ---
 
 class _LevelProgressCard extends StatelessWidget {
   final User user;

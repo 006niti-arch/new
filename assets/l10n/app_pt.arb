@@ -1,0 +1,23 @@
+{
+  "missionControl": "Centro de Controle",
+  "loginWelcome": "Pronto para decolar?",
+  "loginSubtitle": "Faça login para lançar sua próxima campanha.",
+  "createAccountTitle": "Junte-se à Missão",
+  "createAccountSubtitle": "Crie uma conta para começar.",
+  "emailAddress": "Endereço de e-mail",
+  "password": "Senha",
+  "login": "Entrar",
+  "createAccount": "Criar Conta",
+  "homeImportContacts": "Importar dos Contatos",
+  "homeImportContactsSubtitle": "Selecione números do seu celular",
+  "homeCreateFromFile": "Criar Campanha a Partir de Arquivo",
+  "homeCreateFromFileSubtitle": "Carregue um arquivo CSV ou Excel",
+  "homeQuickSend": "Envio Rápido",
+  "homeQuickSendSubtitle": "Digite os números manualmente",
+  "homeCampaignHistory": "Histórico de Campanhas",
+  "homeCampaignHistorySubtitle": "Revise campanhas anteriores",
+  "homeManageUnsubscribes": "Gerenciar Inscrições",
+  "homeManageUnsubscribesSubtitle": "Veja sua lista de cancelamentos",
+  "settingsTitle": "Configurações e Informações",
+  "settingsPlanDetails": "Detalhes do Plano e Preços"
+}
