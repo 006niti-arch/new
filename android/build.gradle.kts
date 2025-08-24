@@ -1,56 +1,43 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    // Add this line to apply the Google Services plugin
-    id 'com.google.gms.google-services'
+    id("com.android.application") version "8.2.1" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.10" apply false
+    id("com.google.gms.google-services") version "4.4.1" apply false
 }
-
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
 android {
-    namespace "com.example.whatsapp_sender" // Make sure this matches your package name
-    compileSdk 34
+    namespace = "com.example.whatsapp_sender"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId "com.example.whatsapp_sender" // Make sure this matches your package name
-        minSdk 21
-        targetSdk 34
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        applicationId = "com.example.whatsapp_sender"
+        minSdk = 21
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 
 flutter {
-    source '../..'
+    source = "../.."
 }
 
 dependencies {
-    // Add the Firebase BOM (Bill of Materials)
-    implementation platform('com.google.firebase:firebase-bom:33.1.0')
-
-    // Add the dependency for the Firebase Authentication library
-    // (no version number needed because of the BOM)
-    implementation 'com.google.firebase:firebase-auth'
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth")
 }
